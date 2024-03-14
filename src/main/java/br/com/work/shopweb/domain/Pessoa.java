@@ -1,26 +1,51 @@
 package br.com.work.shopweb.domain;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import br.com.work.shopweb.domain.enums.Perfil;
+import com.fasterxml.jackson.annotation.JsonFormat;
 
-public abstract class Pessoa {
+import br.com.work.shopweb.domain.enums.Perfil;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+
+@Entity
+public abstract class Pessoa implements Serializable {
+	//private static final long serialVersionUID = 1L;
+	
+	//@Entity(name = "TB_NOMETABELA") = informa que a classe e uma entidade para criar tabela no banco
+	//implements Serializable = permite q dados possam ser guardadas em memoria para serem recuperadas posteriormente
 	
 	//abstract = Não permite criar instancia/objeto do Tipo Pessoa
 	//protected = Da acesso aos atributos para todas as classes que herdarem Pessoa (herança)
+	
+	@Id //informa que esse sera coluna de id do banco
+	@GeneratedValue(strategy = GenerationType.IDENTITY) //informa que os numeros sera gerado id diferente sequencial
 	protected Integer id;
 	protected String nome;
+	
+	@Column(unique = true) //coluna unica, nao pode ter valores iguais
 	protected String cpf;
+	@Column(unique = true)
 	protected String email;
 	protected String senha;
 	
 	//Set<> = Não permite que tenha 2 valores iguais dentro da lista 
 	//HashSet<>() = evitar exeção de ponteiro null
+	@ElementCollection(fetch = FetchType.EAGER) //informa que essa colecao do tipo integer, no get assegura lista de perfis tem q vir
+	@CollectionTable(name = "PERFIS") //Cria tabela de colecao
 	protected Set<Integer> perfis = new HashSet<>();
+	@JsonFormat(pattern = "dd/MM/yyyy") //formata padrao da data
 	protected LocalDate dataCriacao = LocalDate.now();
 	
 	public Pessoa() {
